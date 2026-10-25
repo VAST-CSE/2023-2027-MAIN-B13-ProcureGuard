@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Intelligent Procurement Verification and Supply Risk Prediction System. Automated 3-way matching of PO, GRN, and invoices with human-in-the-loop governance.">
+  <title>Intelligent Procurement System | Verification & Supply Risk</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge">Academic Prototype</div>
+        <div class="brand-title">
+          <span>🛡️</span>
+          <span>ProcureIntel</span>
+        </div>
+        <div class="brand-subtitle">Verification & Risk System</div>
+      </div>
+
+      <ul class="nav-menu">
+        <li>
+          <a class="nav-link active" data-tab="dashboard">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-tab="transactions">
+            <span class="nav-icon">📑</span>
+            <span>3-Way Transactions</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-tab="discrepancies">
+            <span class="nav-icon">⚠️</span>
+            <span>Discrepancy Review</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" data-tab="risk">
+            <span class="nav-icon">📈</span>
+            <span>Supplier Risk (Demo)</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div id="backend-status-pill" class="engine-status-pill">
+          <span class="engine-pulse"></span> Initializing Engine...
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Application Area -->
+    <main class="main-content">
+      <!-- Top Sticky Bar -->
+      <header class="top-navbar">
+        <div class="page-header-info">
+          <h1>Procurement Verification & Risk Portal</h1>
+          <p>Automated 3-way reconciliation (PO, GRN, Invoice) with human-in-the-loop review</p>
+        </div>
+        <div class="top-actions">
+          <button id="btn-run-all-verify" class="btn btn-primary" title="Execute VerificationEngine against all procurement batches">
+            <span>⚡</span>
+            <span>Run 3-Way Verification</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <!-- ==========================================
+             TAB 1: DASHBOARD
+             ========================================== -->
+        <section id="tab-dashboard" class="tab-pane active">
+          <!-- Ethical Standard Notice -->
+          <div class="notice-banner notice-ethics">
+            <div class="notice-icon">ℹ️</div>
+            <div class="notice-content">
+              <h4>System Governance: Human-in-the-Loop Standard</h4>
+              <p>
+                Our 3-way matching rules detect quantities, pricing variances, and reference mismatches. 
+                Discrepancies are <strong>never classified as fraud</strong>; all variances are formatted 
+                with factual explanations and routed to procurement officers for human review.
+              </p>
+            </div>
+          </div>
+
+          <!-- KPI Metrics Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Total Packages</span>
+                <div class="kpi-icon-badge" style="background: rgba(99, 102, 241, 0.15); color: #818CF8;">📦</div>
+              </div>
+              <div id="kpi-total-tx" class="kpi-value">0</div>
+              <div class="kpi-subtext">Evaluated across PO, GRN & Invoice</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Clean Matches</span>
+                <div class="kpi-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">✅</div>
+              </div>
+              <div id="kpi-matched-tx" class="kpi-value">0</div>
+              <div class="kpi-subtext">Approved without discrepancies</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Human Review Queue</span>
+                <div class="kpi-icon-badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">🔍</div>
+              </div>
+              <div id="kpi-review-tx" class="kpi-value">0</div>
+              <div class="kpi-subtext">Flagged variances awaiting review</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Avg Supplier Risk</span>
+                <div class="kpi-icon-badge" style="background: rgba(139, 92, 246, 0.15); color: #C084FC;">📊</div>
+              </div>
+              <div id="kpi-demo-risk" class="kpi-value">--</div>
+              <div class="kpi-subtext"><span class="badge badge-demo">Sample/Demo Metric</span></div>
+            </div>
+          </div>
+
+          <!-- Audit Activity Section -->
+          <div class="section-panel">
+            <div class="section-panel-header">
+              <div class="section-title">
+                <span>📋</span>
+                <span>Recent Procurement Package Audit Feed</span>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Package ID</th>
+                    <th>Procurement Scope</th>
+                    <th>Match Status</th>
+                    <th>Discrepancy Details</th>
+                    <th>Engine Source</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-audit-tbody">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 2: TRANSACTIONS (3-WAY MATCH VIEW)
+             ========================================== -->
+        <section id="tab-transactions" class="tab-pane">
+          <div class="section-panel">
+            <div class="section-panel-header">
+              <div>
+                <div class="section-title">
+                  <span>📑</span>
+                  <span>Three-Way Document Reconciliation</span>
+                </div>
+                <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:4px;">
+                  Comparing the Purchase Order (commitment), Goods Received Note (physical receipt), and Supplier Invoice (billing request).
+                </p>
+              </div>
+            </div>
+
+            <div id="transactions-list-container">
+              <!-- Rendered by JavaScript -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 3: DISCREPANCY REVIEW
+             ========================================== -->
+        <section id="tab-discrepancies" class="tab-pane">
+          <div class="section-panel">
+            <div class="section-panel-header">
+              <div>
+                <div class="section-title">
+                  <span>⚠️</span>
+                  <span>Discrepancy Review & Governance Console</span>
+                </div>
+                <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:4px;">
+                  All detected variances are held in this queue. Procurement officers inspect and record resolution notes.
+                </p>
+              </div>
+
+              <div>
+                <label for="discrepancy-filter" style="font-size:0.8rem; color:var(--text-muted); margin-right:8px;">Filter by Type:</label>
+                <select id="discrepancy-filter" class="btn btn-secondary btn-sm" style="background:var(--bg-card); color:var(--text-primary); border-color:var(--border-subtle); padding:6px 12px;">
+                  <option value="ALL">All Discrepancy Types</option>
+                  <option value="QUANTITY_MISMATCH">Quantity Mismatch</option>
+                  <option value="PRICE_MISMATCH">Price Mismatch</option>
+                  <option value="REFERENCE_MISMATCH">Reference Mismatch</option>
+                  <option value="SUPPLIER_MISMATCH">Supplier Mismatch</option>
+                  <option value="DATA_VALIDATION_ERROR">Data Validation Error</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Package ID</th>
+                    <th>Type</th>
+                    <th>Field</th>
+                    <th>Factual Explanation</th>
+                    <th>Review Status</th>
+                    <th>Human Action</th>
+                  </tr>
+                </thead>
+                <tbody id="discrepancies-tbody">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 4: SUPPLIER RISK (DEMO / SAMPLE DATA)
+             ========================================== -->
+        <section id="tab-risk" class="tab-pane">
+          <!-- Transparent College Project Disclaimer -->
+          <div class="notice-banner notice-demo">
+            <div class="notice-icon">🔬</div>
+            <div class="notice-content">
+              <h4>Academic Project Notice: Sample / Prototype Risk Data</h4>
+              <p>
+                The risk indicators displayed below represent <strong>sample demonstration fixtures</strong>.
+                Machine Learning predictive models (delivery delay forecasting, pricing volatility risk, and supplier default scoring) 
+                are scheduled for implementation in <strong>Phase 3</strong> of the project roadmap. 
+                No predictive ML claims are made for the current baseline.
+              </p>
+            </div>
+          </div>
+
+          <div class="section-panel">
+            <div class="section-panel-header">
+              <div>
+                <div class="section-title">
+                  <span>📈</span>
+                  <span>Supplier Reliability & Risk Profiles (Phase 3 Prototype)</span>
+                </div>
+                <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:4px;">
+                  Sample telemetry intended to feed into the upcoming predictive risk model.
+                </p>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Supplier</th>
+                    <th>Category</th>
+                    <th>Demo Risk Tier</th>
+                    <th>On-Time Delivery</th>
+                    <th>Invoice Accuracy</th>
+                    <th>Avg Lead Time</th>
+                    <th>Prototype Context</th>
+                  </tr>
+                </thead>
+                <tbody id="supplier-risk-tbody">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/sample_data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
